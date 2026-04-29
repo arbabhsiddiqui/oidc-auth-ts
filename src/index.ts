@@ -1,8 +1,21 @@
-import express from 'express'
-const app = express()
-app.get('/', (req, res) => {
-    res.send('Hello, World!')
-})
-app.listen(3000, () => {
-    console.log('Server is running on port 3000')
-})
+import { createServer } from 'node:http'
+import { env } from './common/config/env'
+import { createExpressApplication } from './app'
+
+
+async function main() {
+    try {
+        const server = createServer(createExpressApplication())
+
+        server.listen(env.PORT, () => {
+            console.log(`http server is running on PORT ${env.PORT}`)
+        })
+
+    } catch (error) {
+        console.error(`Error starting server: ${error}`)
+        throw error
+    }
+}
+
+
+main()

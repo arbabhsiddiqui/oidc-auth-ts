@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -11,13 +11,22 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/node": "^25.6.0",
+   "@types/express": "^5.0.6",
+    "@types/node": "^25.5.2",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.31.10",
     "ts-node": "^10.9.2",
     "tsc-watch": "^7.2.0",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.2"
   },
   "dependencies": {
-    "express": "^5.2.1"
+     "@types/jsonwebtoken": "^9.0.10",
+    "dotenv": "^17.4.0",
+    "drizzle-orm": "^0.45.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
   }
 }
