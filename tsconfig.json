@@ -1,46 +1,28 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
 
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
+    // Node Environment
     "module": "commonjs",
-    "target": "es2020",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    // For nodejs:
-    "lib": ["es2020"],
+    "target": "es2022",
+    "lib": ["es2022"],
     "types": ["node"],
-    // and npm install -D @types/node
 
-    // Other Outputs
+    // Output
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
 
-    // Stricter Typechecking Options
+    // Type Safety
+    "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
+    // Interop
+    "esModuleInterop": true,
 
-    // Recommended Options
-    "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": false,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
+    // Optional
     "skipLibCheck": true
-  }
+  },
+  "exclude": ["drizzle.config.ts", "node_modules"]
 }

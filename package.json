@@ -3,9 +3,12 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "dev": "tsc-watch --onSuccess \"node dist/index\"",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "studio": "drizzle-kit studio",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "author": "",
   "license": "ISC",
@@ -17,7 +20,6 @@
     "drizzle-kit": "^0.31.10",
     "ts-node": "^10.9.2",
     "tsc-watch": "^7.2.0",
-    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   },
   "dependencies": {
