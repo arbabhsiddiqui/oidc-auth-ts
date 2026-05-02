@@ -12,6 +12,12 @@ export const findClient = (clientId: string) => {
     return db.select().from(clients).where(eq(clients.clientId, clientId)).limit(1)
 }
 
+export const findClientById = (id: number) => {
+    return db.select().from(clients)
+        .where(eq(clients.id, id))
+        .limit(1)
+}
+
 // SESSION
 export const createSession = (data: {
     userId: number
@@ -54,7 +60,8 @@ export const createUser = (data: {
 // REFRESH TOKENS
 export const createRefreshToken = (data: {
     userId: number
-    token: string
+    token: string,
+    clientId: number,
     expiresAt: Date
 }) => {
     return db.insert(refreshTokens).values(data)

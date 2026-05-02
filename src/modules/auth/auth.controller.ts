@@ -6,21 +6,12 @@ export const login = async (req: Request, res: Response) => {
     try {
         const { email, password, redirect } = req.body
 
-        const { sessionToken, accessToken, refreshToken } =
-            await service.login(email, password)
+        const { sessionToken } = await service.login(email, password)
+        res.cookie('session', sessionToken, { httpOnly: true })
 
-        res.cookie('session', sessionToken, {
-            httpOnly: true,
-            sameSite: 'lax',
-            secure: false,
-        })
+        if (redirect) return res.redirect(redirect)
 
-        // 👇 If redirect exists → redirect instead of JSON
-        if (redirect) {
-            return res.redirect(redirect)
-        }
-
-        res.json({ accessToken, refreshToken })
+        res.json({ success: true })
     } catch (err: any) {
         res.status(400).json({ error: err.message })
     }

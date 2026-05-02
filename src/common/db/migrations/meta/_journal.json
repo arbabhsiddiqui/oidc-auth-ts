@@ -15,6 +15,13 @@
       "when": 1777695524793,
       "tag": "0001_dazzling_siren",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777710735757,
+      "tag": "0002_futuristic_mole_man",
+      "breakpoints": true
     }
   ]
 }

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { PRIVATE_KEY } from '../../common/config/cert'
-import { env } from 'process'
+import { env } from '../../common/config/env'
 
 const ACCESS_TOKEN_EXPIRY = '15m'
 
@@ -22,25 +22,7 @@ export const login = async (email: string, password: string) => {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
 
-    const accessToken = jwt.sign(
-        {
-            sub: user.id,
-            iss: env.ISSUER,
-            aud: client.clientId,
-        },
-        PRIVATE_KEY,
-        { algorithm: 'RS256', expiresIn: '15m' }
-    )
-
-    const refreshToken = crypto.randomUUID()
-
-    await repo.createRefreshToken({
-        userId: user.id,
-        token: refreshToken,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    })
-
-    return { sessionToken, accessToken, refreshToken }
+    return { sessionToken }
 }
 
 // AUTHORIZE FLOW
@@ -105,16 +87,31 @@ export const exchangeToken = async ({
         throw new Error('Code expired')
     }
 
-    // one-time use
     await repo.deleteAuthCode(code)
 
     const accessToken = jwt.sign(
-        { sub: authCode.userId },
+        {
+            sub: authCode.userId,
+            iss: process.env.ISSUER,
+            aud: client.clientId,
+        },
         PRIVATE_KEY,
-        { algorithm: 'RS256', expiresIn: ACCESS_TOKEN_EXPIRY }
+        {
+            algorithm: 'RS256',
+            expiresIn: ACCESS_TOKEN_EXPIRY,
+        }
     )
 
-    return { accessToken }
+    const refreshToken = crypto.randomUUID()
+
+    await repo.createRefreshToken({
+        userId: authCode.userId,
+        token: refreshToken,
+        clientId: client.id, // 👈 IMPORTANT
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    })
+
+    return { accessToken, refreshToken }
 }
 
 
@@ -148,6 +145,7 @@ export const refresh = async (token: string) => {
     await repo.createRefreshToken({
         userId: stored.userId,
         token: newRefreshToken,
+        clientId: stored.clientId,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
 

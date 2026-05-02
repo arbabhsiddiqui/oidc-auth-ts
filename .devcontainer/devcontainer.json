@@ -2,17 +2,17 @@
   "name": "Node + Postgres Dev",
   "remoteUser": "node",
   "dockerComposeFile": "../docker-compose.yml",
-  "service": "app",
+  "service": "oidc_app",
   "workspaceFolder": "/app",
   "shutdownAction": "stopCompose",
   "overrideCommand": true,
   "mounts": [
-  "source=${localEnv:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind,consistency=cached"
-],
-"features": {
-  "ghcr.io/devcontainers/features/github-cli:1": {},
-  "ghcr.io/devcontainers/features/docker-in-docker:2": {}
-},
+    "source=${localEnv:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind,consistency=cached"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [

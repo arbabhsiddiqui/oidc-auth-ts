@@ -70,6 +70,9 @@ export const refreshTokens = pgTable("refresh_tokens", {
     userId: integer("user_id")
         .references(() => users.id)
         .notNull(),
+    clientId: integer("client_id")
+        .references(() => clients.id)
+        .notNull(),
 
     token: varchar("token", { length: 500 }).notNull(),
 
