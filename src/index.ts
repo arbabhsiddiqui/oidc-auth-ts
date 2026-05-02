@@ -1,6 +1,6 @@
 import { createServer } from 'node:http'
 import { env } from './common/config/env'
-import { createExpressApplication } from './app'
+import { createExpressApplication } from './modules'
 
 
 async function main() {

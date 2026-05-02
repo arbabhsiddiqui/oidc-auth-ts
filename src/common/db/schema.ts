@@ -20,21 +20,6 @@ import { sql } from "drizzle-orm";
 // });
 
 // Users Table 
-export const users = pgTable("users", {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 255 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
-    password: varchar("password", { length: 255 }).notNull(), // bcrypt hash
-
-    resetToken: varchar("reset_token", { length: 255 }),
-    resetTokenExpiresAt: timestamp("reset_token_expires_at"),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-        .defaultNow()
-        .notNull()
-        .$onUpdateFn(() => new Date()),
-});
 
 
 // Seats Table
