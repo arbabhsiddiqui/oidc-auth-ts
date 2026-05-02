@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { PRIVATE_KEY } from '../../common/config/cert'
+import { env } from 'process'
 
 const ACCESS_TOKEN_EXPIRY = '15m'
 
@@ -22,7 +23,11 @@ export const login = async (email: string, password: string) => {
     })
 
     const accessToken = jwt.sign(
-        { sub: user.id },
+        {
+            sub: user.id,
+            iss: env.ISSUER,
+            aud: client.clientId,
+        },
         PRIVATE_KEY,
         { algorithm: 'RS256', expiresIn: '15m' }
     )

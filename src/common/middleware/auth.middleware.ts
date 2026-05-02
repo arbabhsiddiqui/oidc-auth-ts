@@ -25,8 +25,6 @@ export const authenticate = (
             PUBLIC_KEY,
             { algorithms: ['RS256'] }
         );
-
-
         (req as any).user = payload
 
         next()
