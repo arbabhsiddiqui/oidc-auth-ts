@@ -1,21 +1,28 @@
 
 import express from 'express'
 import type { Router } from 'express'
-import * as controller from './auth.controller'
+import AuthenticationController from './auth.controller'
 import { authenticate } from '../../common/middleware/auth.middleware'
+import AuthService from './auth.service';
+import AuthRepository from './auth.repository';
+import { validate } from '../../common/middleware/validate.middleware';
+import { loginSchema } from './auth.schema';
+
+// 1. Manually resolve dependencies (The "Composition Root")
+const authRepo = new AuthRepository();
+const authService = new AuthService(authRepo);
+const authController = new AuthenticationController(authService);
 
 export const authRouter: Router = express.Router()
 
 
-authRouter.get('/authorize', controller.authorize)
-authRouter.post('/token', controller.token)
+authRouter.get('/authorize', authController.authorize)
+authRouter.post('/token', authController.token)
 
-authRouter.get('/login', controller.loginPage)
+authRouter.get('/login', authController.loginPage)
 
-authRouter.post('/login', controller.login)
-authRouter.post('/register', controller.register)
-authRouter.post('/refresh', controller.refresh)
+authRouter.post('/login', validate(loginSchema), authController.login)
+authRouter.post('/register', authController.register)
+authRouter.post('/refresh', authController.refresh)
 
-authRouter.get('/me', authenticate, (req, res) => {
-    res.json({ user: (req as any).user })
-})
+authRouter.get('/me', authenticate, authController.me)

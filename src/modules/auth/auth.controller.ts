@@ -1,27 +1,33 @@
 import { Request, Response } from 'express'
-import * as service from './auth.service'
+import { catchAsync } from '../../common/utils/async-handler'
 
-// LOGIN
-export const login = async (req: Request, res: Response) => {
-    try {
+import AuthService from './auth.service'
+import ApiResponse from '../../common/utils/api-response'
+import ApiError from '../../common/utils/api-error'
+
+
+class AuthenticationController {
+    constructor(private readonly authService: AuthService) { }
+
+
+    // LOGIN
+    public login = catchAsync(async (req: Request, res: Response) => {
         const { email, password, redirect } = req.body
 
-        const { sessionToken } = await service.login(email, password)
+        const { sessionToken } = await this.authService.login({ email, password })
         res.cookie('session', sessionToken, { httpOnly: true })
 
         if (redirect) return res.redirect(redirect)
 
-        res.json({ success: true })
-    } catch (err: any) {
-        res.status(400).json({ error: err.message })
-    }
-}
+
+        ApiResponse.ok(res, 'Login successful')
+    })
 
 
-export const loginPage = (req: Request, res: Response) => {
-    const redirect = req.query.redirect || '/'
+    public loginPage = catchAsync(async (req: Request, res: Response) => {
+        const redirect = req.query.redirect || '/'
 
-    res.send(`
+        res.send(`
     <html>
       <body>
         <h2>Login</h2>
@@ -41,16 +47,15 @@ export const loginPage = (req: Request, res: Response) => {
       </body>
     </html>
   `)
-}
+    })
 
-// AUTHORIZE
-export const authorize = async (req: Request, res: Response) => {
-    try {
+    // AUTHORIZE
+    public authorize = catchAsync(async (req: Request, res: Response) => {
         const { client_id, redirect_uri, state } = req.query
 
         const sessionToken = req.cookies?.session
 
-        const result = await service.authorize({
+        const result = await this.authService.authorize({
             clientId: client_id as string,
             redirectUri: redirect_uri as string,
             sessionToken,
@@ -63,49 +68,44 @@ export const authorize = async (req: Request, res: Response) => {
         const redirectUrl = `${redirect_uri}?code=${result.code}&state=${state}`
 
         return res.redirect(redirectUrl)
-    } catch (err: any) {
-        res.status(400).json({ error: err.message })
-    }
-}
+    })
 
-// TOKEN
-export const token = async (req: Request, res: Response) => {
-    try {
+    // TOKEN
+    public token = catchAsync(async (req: Request, res: Response) => {
         const { code, client_id, client_secret } = req.body
 
-        const tokens = await service.exchangeToken({
+        const tokens = await this.authService.exchangeToken({
             code,
             clientId: client_id,
             clientSecret: client_secret,
         })
 
         res.json(tokens)
-    } catch (err: any) {
-        res.status(400).json({ error: err.message })
-    }
-}
+
+    })
 
 
-export const register = async (req: Request, res: Response) => {
-    try {
+    public register = catchAsync(async (req: Request, res: Response) => {
+
         const { name, email, password } = req.body
 
-        const user = await service.register(name, email, password)
+        const user = await this.authService.register(name, email, password)
 
-        res.json(user)
-    } catch (err: any) {
-        res.status(400).json({ error: err.message })
-    }
-}
+        return ApiResponse.created(res, 'User registered successfully', user);
+    })
 
-export const refresh = async (req: Request, res: Response) => {
-    try {
+    public refresh = catchAsync(async (req: Request, res: Response) => {
         const { refreshToken } = req.body
 
-        const tokens = await service.refresh(refreshToken)
+        const tokens = await this.authService.refresh(refreshToken)
 
         res.json(tokens)
-    } catch (err: any) {
-        res.status(400).json({ error: err.message })
-    }
+
+    })
+
+    public me = catchAsync(async (req: Request, res: Response) => {
+        const user = await this.authService.getCurrentUser(+req.user!.userId)
+        return ApiResponse.ok(res, 'User fetched', user);
+    })
 }
+export default AuthenticationController
