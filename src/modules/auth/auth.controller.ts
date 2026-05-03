@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { catchAsync } from '../../common/utils/async-handler'
 
 import AuthService from './auth.service'
+import { env } from '../../common/config/env'
 import ApiResponse from '../../common/utils/api-response'
 import ApiError from '../../common/utils/api-error'
 
@@ -15,7 +16,13 @@ class AuthenticationController {
         const { email, password, redirect } = req.body
 
         const { sessionToken } = await this.authService.login({ email, password })
-        res.cookie('session', sessionToken, { httpOnly: true })
+      // set an idp_session cookie for SSO across authorize requests
+      res.cookie('idp_session', sessionToken, {
+        httpOnly: true,
+        maxAge: env.SESSION_EXPIRY_MS,
+        domain: 'localhost',
+        sameSite: 'lax',
+      })
 
         if (redirect) return res.redirect(redirect)
 
@@ -53,7 +60,8 @@ class AuthenticationController {
     public authorize = catchAsync(async (req: Request, res: Response) => {
         const { client_id, redirect_uri, state } = req.query
 
-        const sessionToken = req.cookies?.session
+      // Support multiple cookie names for compatibility (idp_session preferred)
+      const sessionToken = req.cookies?.idp_session || req.cookies?.sid || req.cookies?.session
 
         const result = await this.authService.authorize({
             clientId: client_id as string,
@@ -98,6 +106,16 @@ class AuthenticationController {
         const { refreshToken } = req.body
 
         const tokens = await this.authService.refresh(refreshToken)
+
+        // if a sessionToken was issued/returned, set the idp_session cookie to extend SSO
+        if ((tokens as any).sessionToken) {
+          res.cookie('idp_session', (tokens as any).sessionToken, {
+            httpOnly: true,
+            maxAge: env.SESSION_EXPIRY_MS,
+            domain: 'localhost',
+            sameSite: 'lax',
+          })
+        }
 
         res.json(tokens)
 

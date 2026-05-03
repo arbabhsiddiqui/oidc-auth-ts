@@ -162,7 +162,16 @@ class AuthService {
 
         const accessToken = generateAccessToken(stored.userId, String(stored.clientId))
 
-        return { accessToken, refreshToken: newRefreshToken }
+        // create a new/revived SSO session for the user so idp_session can be extended
+        const sessionToken = crypto.randomUUID()
+
+        await this._authRepo.createSession({
+            userId: stored.userId,
+            sessionToken,
+            expiresAt: new Date(Date.now() + env.SESSION_EXPIRY_MS),
+        })
+
+        return { accessToken, refreshToken: newRefreshToken, sessionToken }
     }
 
     public async getCurrentUser(userId: number) {
