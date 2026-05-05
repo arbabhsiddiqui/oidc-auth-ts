@@ -20,9 +20,12 @@ authRouter.get('/authorize', authController.authorize)
 authRouter.post('/token', authController.token)
 
 authRouter.get('/login', authController.loginPage)
-
 authRouter.post('/login', validate(loginSchema), authController.login)
+
+
+authRouter.get('/register', authController.registerPage)
 authRouter.post('/register', authController.register)
+
 authRouter.post('/refresh', authController.refresh)
 
 authRouter.get('/me', authenticate, authController.me)
